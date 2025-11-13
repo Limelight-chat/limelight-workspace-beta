@@ -60,12 +60,15 @@ const Index = () => {
     await uploadMutation.mutateAsync(file);
   };
 
-  const handleQuery = async (query: string) => {
+  const handleQuery = async (query: string, tableIds: string[]) => {
     if (tables.length === 0) {
       toast.error("Please upload a table first");
       return;
     }
-    await queryMutation.mutateAsync(query);
+    const queryWithContext = tableIds.length > 0 
+      ? `[Using tables: ${tableIds.map(id => tables.find(t => t.id === id)?.name).join(", ")}] ${query}`
+      : query;
+    await queryMutation.mutateAsync(queryWithContext);
   };
 
   return (
@@ -112,6 +115,7 @@ const Index = () => {
                 onQuery={handleQuery}
                 isLoading={queryMutation.isPending}
                 disabled={tables.length === 0}
+                tables={tables}
               />
             </div>
 
