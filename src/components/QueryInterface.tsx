@@ -35,49 +35,45 @@ export function QueryInterface({ onQuery, isLoading, disabled }: QueryInterfaceP
   };
 
   return (
-    <Card className="backdrop-blur-sm bg-glass-bg/50 border-glass-border">
+    <Card className="border-border shadow-sm">
       <div className="p-6 space-y-4">
-        <div className="flex items-center gap-2 mb-4">
-          <Sparkles className="w-5 h-5 text-primary" />
-          <h2 className="text-xl font-semibold text-foreground">Ask a Question</h2>
-        </div>
-
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Textarea
-            placeholder="Type your question in plain English..."
+            placeholder="Ask a question about your data in plain English..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={disabled || isLoading}
-            className="min-h-[120px] resize-none"
+            className="min-h-[140px] resize-none text-base"
           />
           
           <div className="flex items-center justify-between">
             <p className="text-xs text-muted-foreground">
-              Press Enter to submit, Shift+Enter for new line
+              Enter to submit • Shift + Enter for new line
             </p>
             <Button 
               onClick={handleSubmit}
               disabled={!query.trim() || disabled || isLoading}
+              size="sm"
               className="gap-2"
             >
-              <Send className="w-4 h-4" />
               {isLoading ? "Processing..." : "Submit"}
+              <Send className="w-3.5 h-3.5" />
             </Button>
           </div>
         </div>
 
         <div className="pt-4 border-t border-border">
-          <p className="text-sm font-medium text-foreground mb-3">Example queries:</p>
+          <p className="text-xs font-medium text-muted-foreground mb-2.5">Examples</p>
           <div className="flex flex-wrap gap-2">
             {EXAMPLE_QUERIES.map((example, idx) => (
               <Button
                 key={idx}
-                variant="outline"
+                variant="secondary"
                 size="sm"
                 onClick={() => setQuery(example)}
                 disabled={disabled || isLoading}
-                className="text-xs"
+                className="text-xs h-7 px-3"
               >
                 {example}
               </Button>
