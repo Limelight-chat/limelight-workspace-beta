@@ -6,7 +6,7 @@ import { QueryInterface } from "@/components/QueryInterface";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
 import { api, TableInfo, QueryResult } from "@/lib/api";
 import { toast } from "sonner";
-import { Database } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 const Index = () => {
   const [selectedTable, setSelectedTable] = useState<TableInfo | null>(null);
@@ -46,7 +46,8 @@ const Index = () => {
   });
 
   const queryMutation = useMutation({
-    mutationFn: api.executeQuery,
+    mutationFn: ({ query, tableIds }: { query: string; tableIds?: string[] }) => 
+      api.executeQuery(query, tableIds),
     onSuccess: (data) => {
       setQueryResult(data);
       toast.success("Query executed successfully");
@@ -65,40 +66,49 @@ const Index = () => {
       toast.error("Please upload a table first");
       return;
     }
-    const queryWithContext = tableIds.length > 0 
-      ? `[Using tables: ${tableIds.map(id => tables.find(t => t.id === id)?.name).join(", ")}] ${query}`
-      : query;
-    await queryMutation.mutateAsync(queryWithContext);
+    // Pass tableIds directly to the API instead of modifying the query string
+    await queryMutation.mutateAsync({ query, tableIds: tableIds.length > 0 ? tableIds : undefined });
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary text-primary-foreground">
-              <Database className="w-5 h-5" />
+    <div className="min-h-screen bg-[#0d0d0d] text-white">
+      {/* Header - OpenAI Style */}
+      <header className="border-b border-white/10 bg-black/20 backdrop-blur-xl sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-[#ff7d0b] to-[#ed3558]">
+                <Sparkles className="w-4 h-4 text-white" />
+              </div>
+              <h1 className="text-xl font-semibold bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+                Limelight Beta
+              </h1>
             </div>
-            <h1 className="text-xl font-semibold text-foreground">Natural Language Query Service</h1>
+            <div className="text-sm text-white/40">
+              Natural Language Data Analysis
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-6 py-8 max-w-7xl">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
-            <div>
-              <h2 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">Upload Data</h2>
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Sidebar - OpenAI Style */}
+          <div className="lg:col-span-3 space-y-4">
+            <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4">
+              <h2 className="text-xs font-semibold text-white/60 mb-3 uppercase tracking-wider">
+                Data Sources
+              </h2>
               <FileUpload
                 onUpload={handleUpload}
                 isUploading={uploadMutation.isPending}
               />
             </div>
 
-            <div>
-              <h2 className="text-sm font-semibold text-foreground mb-3 uppercase tracking-wide">Your Tables</h2>
+            <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-4">
+              <h2 className="text-xs font-semibold text-white/60 mb-3 uppercase tracking-wider">
+                Your Tables ({tables.length})
+              </h2>
               <TablesList
                 tables={tables}
                 onDelete={(id) => deleteMutation.mutate(id)}
@@ -108,9 +118,9 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Main Content */}
-          <div className="lg:col-span-3 space-y-6">
-            <div>
+          {/* Main Content - OpenAI Style */}
+          <div className="lg:col-span-9 space-y-6">
+            <div className="bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 p-6">
               <QueryInterface
                 onQuery={handleQuery}
                 isLoading={queryMutation.isPending}
@@ -120,15 +130,22 @@ const Index = () => {
             </div>
 
             {queryResult && (
-              <div>
+              <div className="animate-in fade-in-0 slide-in-from-bottom-4 duration-500">
                 <ResultsDisplay result={queryResult} />
               </div>
             )}
 
             {!queryResult && tables.length === 0 && (
-              <div className="text-center py-20 text-muted-foreground">
-                <Database className="w-12 h-12 mx-auto mb-4 opacity-20" />
-                <p className="text-sm">Upload a file to get started with natural language queries</p>
+              <div className="text-center py-20">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/5 mb-6">
+                  <Sparkles className="w-8 h-8 text-white/30" />
+                </div>
+                <h3 className="text-xl font-semibold text-white/90 mb-2">
+                  Get started with your data
+                </h3>
+                <p className="text-white/40 max-w-md mx-auto">
+                  Upload a CSV or Excel file to begin analyzing your data with natural language queries
+                </p>
               </div>
             )}
           </div>

@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
-import { Upload, File, CheckCircle, XCircle } from "lucide-react";
+import { Upload, Sparkles } from "lucide-react";
 import { useDropzone } from "react-dropzone";
-import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 
@@ -56,41 +55,58 @@ export function FileUpload({ onUpload, isUploading }: FileUploadProps) {
   });
 
   return (
-    <Card className="backdrop-blur-sm bg-glass-bg/50 border-glass-border">
-      <div
-        {...getRootProps()}
-        className={`p-12 border-2 border-dashed rounded-lg transition-all cursor-pointer ${
-          isDragActive 
-            ? "border-primary bg-primary/5" 
-            : "border-border hover:border-primary/50"
-        } ${isUploading ? "opacity-50 cursor-not-allowed" : ""}`}
-      >
-        <input {...getInputProps()} />
-        
-        <div className="flex flex-col items-center space-y-4 text-center">
-          {isUploading ? (
-            <>
-              <File className="w-16 h-16 text-primary animate-pulse" />
-              <div className="w-full max-w-xs space-y-2">
-                <Progress value={uploadProgress} className="h-2" />
-                <p className="text-sm text-muted-foreground">Uploading...</p>
+    <div
+      {...getRootProps()}
+      className={`relative overflow-hidden rounded-2xl p-12 transition-all cursor-pointer ${
+        isDragActive 
+          ? "bg-white/10 border-2 border-[#ff7d0b]" 
+          : "bg-white/5 border-2 border-white/10 hover:bg-white/[0.07] hover:border-white/20"
+      } ${isUploading ? "opacity-50 cursor-not-allowed" : ""}`}
+    >
+      <input {...getInputProps()} />
+      
+      {/* Gradient overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#ff7d0b]/0 to-[#ff7d0b]/0 hover:from-[#ff7d0b]/5 hover:to-transparent transition-all pointer-events-none" />
+      
+      <div className="relative flex flex-col items-center space-y-6 text-center">
+        {isUploading ? (
+          <>
+            <div className="relative">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#ff7d0b] to-[#ed3558] flex items-center justify-center animate-pulse">
+                <Sparkles className="w-10 h-10 text-white" />
               </div>
-            </>
-          ) : (
-            <>
-              <Upload className="w-16 h-16 text-muted-foreground" />
-              <div>
-                <p className="text-lg font-medium text-foreground">
-                  {isDragActive ? "Drop your file here" : "Drag & drop your file here"}
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  or click to browse (CSV, Excel)
-                </p>
+            </div>
+            <div className="w-full max-w-xs space-y-3">
+              <Progress value={uploadProgress} className="h-1.5 bg-white/10" />
+              <p className="text-sm text-white/60">Processing your data...</p>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="relative">
+              <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                <Upload className="w-10 h-10 text-white/40" />
               </div>
-            </>
-          )}
-        </div>
+              {isDragActive && (
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#ff7d0b] to-[#ed3558] flex items-center justify-center">
+                  <Upload className="w-10 h-10 text-white" />
+                </div>
+              )}
+            </div>
+            <div className="space-y-2">
+              <p className="text-lg font-medium text-white">
+                {isDragActive ? "Drop your file here" : "Upload your data"}
+              </p>
+              <p className="text-sm text-white/40">
+                Drag & drop or click to browse
+              </p>
+              <p className="text-xs text-white/30">
+                Supports CSV, XLSX, XLS
+              </p>
+            </div>
+          </>
+        )}
       </div>
-    </Card>
+    </div>
   );
 }

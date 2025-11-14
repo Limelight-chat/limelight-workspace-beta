@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Send, Database, ChevronDown } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { Send, Sparkles, Database, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { TableInfo } from "@/lib/api";
@@ -25,7 +24,6 @@ const EXAMPLE_QUERIES = [
   "What's the average value in the cost column?",
   "Find all records where status is 'active'",
   "Show me the total sum by category",
-  "Which date has the most entries?",
 ];
 
 export function QueryInterface({ onQuery, isLoading, disabled, tables }: QueryInterfaceProps) {
@@ -60,103 +58,103 @@ export function QueryInterface({ onQuery, isLoading, disabled, tables }: QueryIn
     : `${selectedCount} tables`;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !e.metaKey) {
       e.preventDefault();
       handleSubmit();
     }
   };
 
   return (
-    <Card className="border-border shadow-sm">
-      <div className="p-6 space-y-4">
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  className="justify-between min-w-[200px]"
-                  disabled={disabled || isLoading || tables.length === 0}
-                >
-                  <div className="flex items-center gap-2">
-                    <Database className="w-4 h-4" />
-                    <span className="text-sm">{displayText}</span>
-                  </div>
-                  <ChevronDown className="w-4 h-4 opacity-50" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-[250px]">
-                <DropdownMenuLabel>Select Tables</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem
-                  checked={selectedCount === 0 || selectedCount === tables.length}
-                  onCheckedChange={toggleAllTables}
-                  className="font-medium"
-                >
-                  All tables
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuSeparator />
-                {tables.map(table => (
-                  <DropdownMenuCheckboxItem
-                    key={table.id}
-                    checked={selectedTableIds.includes(table.id)}
-                    onCheckedChange={() => toggleTable(table.id)}
-                  >
-                    <div className="flex items-center justify-between w-full">
-                      <span className="truncate">{table.name}</span>
-                      <span className="text-xs text-muted-foreground ml-2">
-                        {table.row_count.toLocaleString()}
-                      </span>
-                    </div>
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-          
-          <Textarea
-            placeholder="Ask a question about your data in plain English..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={disabled || isLoading}
-            className="min-h-[140px] resize-none text-base"
-          />
-          
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-muted-foreground">
-              Enter to submit • Shift + Enter for new line
-            </p>
+    <div className="space-y-6">
+      {/* Table Selection */}
+      <div className="flex items-center gap-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <Button 
-              onClick={handleSubmit}
-              disabled={!query.trim() || disabled || isLoading}
-              size="sm"
-              className="gap-2"
+              variant="outline" 
+              className="justify-between min-w-[200px] bg-white/5 border-white/10 text-white hover:bg-white/10 hover:text-white"
+              disabled={disabled || isLoading || tables.length === 0}
             >
-              {isLoading ? "Processing..." : "Submit"}
-              <Send className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-2">
+                <Database className="w-4 h-4" />
+                <span className="text-sm">{displayText}</span>
+              </div>
+              <ChevronDown className="w-4 h-4 opacity-50" />
             </Button>
-          </div>
-        </div>
-
-        <div className="pt-4 border-t border-border">
-          <p className="text-xs font-medium text-muted-foreground mb-2.5">Examples</p>
-          <div className="flex flex-wrap gap-2">
-            {EXAMPLE_QUERIES.map((example, idx) => (
-              <Button
-                key={idx}
-                variant="secondary"
-                size="sm"
-                onClick={() => setQuery(example)}
-                disabled={disabled || isLoading}
-                className="text-xs h-7 px-3"
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-[250px] bg-[#1a1a1a] border-white/10">
+            <DropdownMenuLabel className="text-white/60">Select Tables</DropdownMenuLabel>
+            <DropdownMenuSeparator className="bg-white/10" />
+            <DropdownMenuCheckboxItem
+              checked={selectedCount === 0 || selectedCount === tables.length}
+              onCheckedChange={toggleAllTables}
+              className="font-medium text-white hover:bg-white/10"
+            >
+              All tables
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuSeparator className="bg-white/10" />
+            {tables.map(table => (
+              <DropdownMenuCheckboxItem
+                key={table.id}
+                checked={selectedTableIds.includes(table.id)}
+                onCheckedChange={() => toggleTable(table.id)}
+                className="text-white hover:bg-white/10"
               >
-                {example}
-              </Button>
+                <div className="flex items-center justify-between w-full">
+                  <span className="truncate">{table.name}</span>
+                  <span className="text-xs text-white/40 ml-2">
+                    {table.row_count.toLocaleString()}
+                  </span>
+                </div>
+              </DropdownMenuCheckboxItem>
             ))}
-          </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      {/* Query Input - OpenAI Style */}
+      <div className="relative">
+        <Textarea
+          placeholder="Ask anything about your data..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+          disabled={disabled || isLoading}
+          className="min-h-[120px] resize-none text-base bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:bg-white/10 transition-colors pr-12"
+        />
+        <Button
+          onClick={handleSubmit}
+          disabled={!query.trim() || disabled || isLoading}
+          size="icon"
+          className="absolute bottom-3 right-3 rounded-lg bg-gradient-to-r from-[#ff7d0b] to-[#ed3558] hover:from-[#ff8c1f] hover:to-[#f04367] text-white border-0 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isLoading ? (
+            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          ) : (
+            <Send className="w-4 h-4" />
+          )}
+        </Button>
+      </div>
+
+      {/* Examples */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2 text-xs text-white/40">
+          <Sparkles className="w-3 h-3" />
+          <span>Try these examples</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          {EXAMPLE_QUERIES.map((example, idx) => (
+            <button
+              key={idx}
+              onClick={() => setQuery(example)}
+              disabled={disabled || isLoading}
+              className="text-left p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm text-white/70 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {example}
+            </button>
+          ))}
         </div>
       </div>
-    </Card>
+    </div>
   );
 }
